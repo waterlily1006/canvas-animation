@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>canvas导入序列帧</title>
+    <style>
+        body {
+            background: pink;
+            overflow-x: hidden;
+        }
+    </style>
+</head>
+<body>
+<canvas id="animation_canvas" width="1400" height="1308"></canvas>
+</body>
+<script>
+    //初始化参数
+    var canvas = null;
+    var ctx = null;
+
+    //预加载序列图片
+    function loadImages(sources, callback) {
+        var loadedImages = 0;
+        var numImages = 0;
+        var images = [];
+        numImages = sources.length;
+        for (var i = 0, len = sources.length; i < len; i++) {
+            images[i] = new Image();
+            //当一张图片加载完成时执行
+            images[i].onload = function () {
+                //当所有图片加载完成时，执行回调函数callback
+                console.log(numImages)
+                loadedImages++;
+                if (loadedImages >= numImages) {
+                    callback(images);
+                }
+            };
+            //把sources中的图片信息导入images数组
+            images[i].src = sources[i];
+        }
+    }
+
+    //播放图片
+    function playImages(images) {
+        var imageNum = images.length;
+        var imageNow = 0;
+        setInterval(function () {
+            ctx.clearRect(0, 0, 1400, 1308);
+            ctx.drawImage(images[imageNow], 0, 0, 1400, 1308);
+            imageNow++;
+            if (imageNow >= imageNum) {
+                imageNow = 0;
+            }
+        }, 70)
+    }
+
+    //初始化
+    window.onload = function () {
+        var sources = [];
+        //构建图片序列数据
+        for (var i = 0; i <= 106; i++) {
+            sources[i] = '../public/hu/hu' + i + '.png';//根据项目修改
+        }
+        //创建画布
+        canvas = document.getElementById("animation_canvas");
+        canvas.width = 1400;
+        canvas.height = 1308;
+
+        ctx = canvas.getContext("2d");
+        //ctx.globalAlpha=0.5透明度
+
+        //执行图片预加载，加载完成后播放图片
+        loadImages(sources, function (images) {
+            playImages(images)
+        });
+    };
+
+</script>
+
+</html>
